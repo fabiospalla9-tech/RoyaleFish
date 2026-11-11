@@ -13,7 +13,14 @@ Everything runs offline, in a local simulation.
 
 Both are the same network: a recurrent V4 actor-critic (transformer over cards and units, spatial encoder for the arena, LSTM memory), about 17M parameters. They load with `load_policy_v4` from the V4 framework (see Requirements).
 
-How much did the fine-tuning help? In a Hog 2.6 mirror test (same deck on both sides, 156 games), A at update 83 beat its own starting checkpoint **86 to 69 (55%)**. That is still a small sample, so take it as a trend, not a final number.
+How much did the fine-tuning help? Two tests of A at update 98 against its own starting checkpoint:
+
+| Test | Games | A v98 | Starting checkpoint |
+|---|---|---|---|
+| Head to head (each side plays Hog 2.6 in turn, the other plays varied decks) | 1,056 | **54.3%** | 45.7% |
+| Both play Hog 2.6 against the same opponent (the original generalist, same deck sequence) | 600 / 561 | **59.7%** win rate | 49.6% win rate |
+
+So against the same opponent, the fine-tuned model wins about 10 percentage points more often than the checkpoint it started from.
 
 ## How training works
 
