@@ -1,0 +1,28 @@
+RoyaleFish
+Copyright RoyaleFish contributors
+
+The model checkpoints in models/ are fine-tuned from checkpoints published by
+the FirstLight CR project (https://github.com/Jaasssoooonnnnn/FirstLight_CR),
+and the training code in royalefish/ runs on top of its V4 framework.
+FirstLight CR is licensed under Apache-2.0. Its NOTICE follows.
+
+----------------------------------------------------------------------
+FirstLight CR
+Copyright FirstLight CR contributors
+
+This distribution contains original offline AI research software, a
+compatibility layer, native probes, and training tools under Apache-2.0.
+
+Third-party game binaries, resources, and modified clients are not included.
+User-supplied APKs and resources, and locally generated derivatives of them,
+remain subject to their respective owners' rights; Apache-2.0 does not grant
+rights to those materials.
+
+FirstLight CR does not connect to Supercell official servers or operate
+official accounts. It is not affiliated with, endorsed by, or representative
+of Supercell. Product names identify compatibility only.
+----------------------------------------------------------------------
+
+RoyaleFish does not include any game binaries, resources, modified clients or
+battle engines. It is not affiliated with, endorsed by, or representative of
+Supercell.
