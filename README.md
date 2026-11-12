@@ -22,6 +22,16 @@ How much did the fine-tuning help? Two tests of A at update 98 against its own s
 
 So against the same opponent, the fine-tuned model wins about 10 percentage points more often than the checkpoint it started from.
 
+## Coming soon
+
+A new release is coming in the next few hours. The models are being moved to the card data of game version 16.635, so they will:
+
+- recognize the **Minion Giant**, which the old card catalog did not know (the models saw it as an "unknown card");
+- know the newer 16.635 mechanics;
+- be trained harder against the decks the Hog 2.6 model struggled with: Mortar, Evo Witch and Minion Giant decks.
+
+Support for **Hero Ice Wizard** is planned next.
+
 ## How training works
 
 A and B train against each other at the same time, and both keep improving. The interesting part is how much data fits through one machine. On a single PC with an RTX 5060 Ti (for playing) and a Tesla V100 (for learning), the GPU learns from **about 2,100 complete games per hour**. Each update trains on **~55,000 decisions from ~64 full games** in a single optimizer step and takes about 70–90 seconds.
