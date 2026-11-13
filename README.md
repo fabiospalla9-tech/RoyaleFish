@@ -63,6 +63,19 @@ In-training win rates of A (last hour of training, not a paired evaluation):
 | Mortar decks | 39% → **48%** |
 | Evo Witch decks | 32% → **45%** |
 
+## Known weaknesses of A v738
+
+Found by playing against the model. We are working on all of them right now.
+
+- **Wasting the only counter.** The biggest one. When A has a single card that answers two of the opponent's cards, it often spends it on the first, less dangerous threat, and then has nothing left for the real one. Examples: The Log on the Princess, then the Goblin Barrel hits the tower; the Cannon placed right at the bridge against Mega Knight + Witch, where it dies at once, then the Hog Rider comes in with nothing to stop it. (The original starting model had this problem even more clearly.)
+- **Log Bait.** Related to the point above: it does not keep The Log for the Goblin Barrel, and against the Evo Goblin Barrel on two lanes it tends to defend the tower with more HP instead of the weaker one.
+- **Ignoring damage on the other lane.** Sometimes it defends one lane perfectly and lets 1,500+ damage through on the other.
+- **Splash damage.** Against Witch / Evo Witch it places the Musketeer right next to its princess tower, so the splash hits both; against Sparky it groups Musketeer and Ice Golem together, and it uses Fireball on Sparky too rarely.
+- **Giant Skeleton.** It does not always stop the death bomb from reaching the tower.
+- **Musketeer turret.** It already uses it much more, but still not in every spot where it would be better than playing another card.
+
+How we are fixing them: harder opponents that punish these mistakes on purpose (a Log Bait specialist and a model trained only to beat the 2.6), focus decks, and drills rebuilt from the exact moments where the model failed, replayed many times with small variations.
+
 ## In progress
 
 A new model is being trained **only to beat the latest Hog 2.6**. It starts from the latest generalist, learns a Minion Giant + Hero Ice Wizard deck by imitation from about 600 high-level replays, then trains by self-play against the frozen Hog 2.6 model and its older versions. Results will be posted here.
