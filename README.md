@@ -83,6 +83,19 @@ That speed comes from a few changes:
 8. **KL anchor.** A small KL term towards the starting checkpoint, computed on half of the groups, keeps the models from forgetting what they already know.
 9. **Opponent choice.** B's decks are chosen more often from the families A loses to, plus 10% mirror games against A itself.
 
+## Our machine
+
+Everything above was trained on one home PC:
+
+| Part | What | Used for |
+|---|---|---|
+| CPU | 2 × Intel Xeon E5-2695 v4 (2 × 18 cores, 72 threads) | the native battle engines and the collectors (30 engines × 16 games = 480 games at once) |
+| RAM | 128 GB | engines, collectors and replay loading |
+| GPU 1 | NVIDIA RTX 5060 Ti 16 GB | inference: plays the moves for all running games (fp16, CUDA graphs) |
+| GPU 2 | NVIDIA Tesla V100 16 GB | training: PPO updates and imitation learning |
+
+Most of the speed comes from the many CPU cores: every game runs on the CPU, and the GPUs answer hundreds of games in one batch.
+
 ## Requirements
 
 - Python 3.12 with PyTorch and a CUDA GPU.
