@@ -4,6 +4,12 @@ An open, community-driven Clash Royale AI. The idea is simple: something like St
 
 Everything runs offline, in a local simulation.
 
+> [!IMPORTANT]
+> **Benchmarking or comparing models? Run every model on the same 16.635 card data.**
+> All current models are trained on game data **16.635** (the tables in `data_16635/`, with the patch in `patches/native_runner_16635.diff`). A model trained on the older 15.535 tables reads cards in a different order, so if one side of a match uses the old tables and the other the new ones, one of them is effectively seeing the wrong cards and the result means nothing.
+> - Convert older models to 16.635 first (a conversion script is coming to this repo soon), then run both sides on a 16.635 native engine.
+> - Don't run the new models on an older engine/data version either. They were trained on the current balance (30+ card balance changes since the old data), so on old stats they play cards that no longer behave as they learned.
+
 ## Models
 
 | File | Deck | Card data | What it is |
@@ -31,9 +37,10 @@ Later versions, same test (both play Hog 2.6 against the original generalist, sa
 | Starting checkpoint | 561 | 49.6% |
 | A v98 | 668 | 61.2% |
 | A v357 | 668 | **73.1%** |
-| A v738 (latest) | — | **estimated 75–80%, not yet verified** |
 
-A v357 more than doubled the gain over the starting checkpoint (+23.5 points, against +11.6 for v98). The v738 figure is an estimate from in-training results only; a paired measurement will be posted here soon.
+A v357 more than doubled the gain over the starting checkpoint (+23.5 points, against +11.6 for v98).
+
+**A v738, measured:** both sides play Hog 2.6, A v738 against the original model it started from, sides swapped: **71.9% (±2.6) over 1,147 games**.
 
 ## What's new in v738
 
@@ -48,7 +55,7 @@ Loading these models needs the 16.635 tables in `data_16635/` and the small fram
 
 **Training changes:**
 
-- **Musketeer turret.** Hero abilities were never offered to the models in the x86 engine; that is fixed. A also gets a small reward for using the Hero Musketeer turret at the right moment (a building-targeting win condition near its tower and no building of its own on the field). Using the turret at the right moment went from about **13% to 37%** of the chances, and the model now often plays two defensive structures (Cannon plus turret), which helps a lot against double win conditions.
+- **Musketeer turret.** Hero abilities were never offered to the models in the x86 engine; that is fixed. A also gets a small reward for using the Hero Musketeer turret at the right moment (a building-targeting win condition near its tower and no building of its own on the field).
 - **Opponent spell reward.** The opponent gets a small reward when its Fireball, Arrows or Lightning kills A's Musketeer, so A learns to protect it.
 - **Tower damage.** The per-hit tower damage term was raised, so small chip damage on the other lane is no longer ignored.
 - **Focus decks.** About 30% of games are played against the decks A struggled with: Mortar, Evo Witch and Minion Giant decks, mostly real meta lists.
@@ -74,15 +81,25 @@ Found by playing against the model. We are working on all of them right now.
 - **Giant Skeleton.** It does not always stop the death bomb from reaching the tower.
 - **Musketeer turret.** It already uses it much more, but still not in every spot where it would be better than playing another card.
 
-How we are fixing them: harder opponents that punish these mistakes on purpose (a Log Bait specialist and a model trained only to beat the 2.6), focus decks, and drills rebuilt from the exact moments where the model failed, replayed many times with small variations.
+How we are fixing them: see **Coming next** below.
 
-## In progress
+## Coming next
 
-A new model is being trained **only to beat the latest Hog 2.6**. It starts from the latest generalist, learns a Minion Giant + Hero Ice Wizard deck by imitation from about 600 high-level replays, then trains by self-play against the frozen Hog 2.6 model and its older versions. Results will be posted here.
+**New A (Hog 2.6), around 900–1,000 updates.** The strongest A so far in training. It will be posted here after a paired benchmark against v738. This run was built on the weaknesses above:
+
+- **Log Bait model (L).** A separate model trained only to exploit A with Log Bait (it gets extra reward for a Goblin Barrel right after A's Log). A against L: about 58% → **66%**.
+- **More opponents.** A plays a league of frozen models instead of a single sparring partner: the latest generalist B (A: about 52% → **56%**, the hardest one), the Log Bait model, the original generalist, an older B, and a community X-Bow model (thanks Blade). A against that X-Bow model: 74% → about **82%**.
+- **Minion Giant, Mortar, Evo Witch decks.** Still 30% of games. Now around **50%** each (they started at 32–39%).
+- **Drills from real mistakes.** Moments where A failed (Log spent before the Goblin Barrel, Cannon thrown at the bridge before the Hog Rider) are replayed many times with small variations. A gets a reward if it gets through the next 20 seconds without tower damage, and a penalty if it doesn't.
+- **Musketeer turret.** Used at the right (useful) moment about **45%** of the chances, up from 32% at the start of this run and 13% before v738. It plays the turret much more, but the Cannon is not dropped: about **4 Cannons per game**, unchanged.
+
+**Log Bait model.** It will be released too, once it has matured a bit more.
+
+**Conversion script.** The script we use to move models between card data versions (15.535 → 16.635) will be added, so older or community models can be compared fairly.
 
 ## How training works
 
-A and B train against each other at the same time, and both keep improving. The interesting part is how much data fits through one machine. On a single PC with an RTX 5060 Ti (for playing) and a Tesla V100 (for learning), the GPU learns from **about 2,100 complete games per hour**. Each update trains on **~55,000 decisions from ~64 full games** in a single optimizer step and takes about 70–90 seconds.
+A trains against a league of models (earlier A and B trained against each other at the same time; now B is frozen and only A learns). The interesting part is how much data fits through one machine. On a single PC with an RTX 5060 Ti (for playing) and a Tesla V100 (for learning), the GPU learns from **about 2,100 complete games per hour**. Each update trains on **~55,000 decisions from ~64 full games** in a single optimizer step and takes about 70–90 seconds.
 
 That speed comes from a few changes:
 
@@ -94,7 +111,7 @@ That speed comes from a few changes:
 6. **Loader in a separate process** (`ever_loader.py`). The next group of games is decoded in another process and shared through memory while the GPU trains on the current group. Games are grouped by length, so very little compute goes to padding.
 7. **One big step per update.** Four groups of 16 games accumulate gradients, then one clipped optimizer step, which matches the size of the original large-scale PPO updates.
 8. **KL anchor.** A small KL term towards the starting checkpoint, computed on half of the groups, keeps the models from forgetting what they already know.
-9. **Opponent choice.** B's decks are chosen more often from the families A loses to, plus 10% mirror games against A itself.
+9. **Opponent choice.** A league of frozen opponents, weighted towards the ones A still struggles against, plus focus decks, drills and 10% mirror games against A itself.
 
 ## Our machine
 
