@@ -24,6 +24,17 @@ How much did the fine-tuning help? Two tests of A at update 98 against its own s
 
 So against the same opponent, the fine-tuned model wins about 10 percentage points more often than the checkpoint it started from.
 
+Later versions, same test (both play Hog 2.6 against the original generalist, same deck sequence):
+
+| Model | Games | Win rate vs original generalist |
+|---|---|---|
+| Starting checkpoint | 561 | 49.6% |
+| A v98 | 668 | 61.2% |
+| A v357 | 668 | **73.1%** |
+| A v738 (latest) | — | **estimated 75–80%, not yet verified** |
+
+A v357 more than doubled the gain over the starting checkpoint (+23.5 points, against +11.6 for v98). The v738 figure is an estimate from in-training results only; a paired measurement will be posted here soon.
+
 ## What's new in v738
 
 **New card data (game version 16.635).** The original card catalog stopped at 122 cards, so the models saw newer content as an "unknown card". The catalog is now rebuilt from 16.635 data:
