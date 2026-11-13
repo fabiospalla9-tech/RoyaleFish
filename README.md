@@ -93,7 +93,23 @@ How we are fixing them: see **Coming next** below.
 - **Drills from real mistakes.** Moments where A failed (Log spent before the Goblin Barrel, Cannon thrown at the bridge before the Hog Rider) are replayed many times with small variations. A gets a reward if it gets through the next 20 seconds without tower damage, and a penalty if it doesn't.
 - **Musketeer turret.** Used at the right (useful) moment about **45%** of the chances, up from 32% at the start of this run and 13% before v738. It plays the turret much more, but the Cannon is not dropped: about **4 Cannons per game**, unchanged.
 
-**Log Bait model.** It will be released too, once it has matured a bit more.
+**Log Bait model (L): done for now.** Its job was to teach A to keep The Log for the Goblin Barrel, and it did (A against L: 58% → 66–69%). It may get its own specialization later.
+
+**Anti-2.6 model (in training).** A model that plays one deck and is trained only to beat our Hog 2.6:
+
+`minion-giant`, `ice-wizard-hero`, `barbarian-barrel`, `bats-ev1`, `cannon-ev1`, `knight`, `skeletons`, `lightning` (a Fireball variant is also played)
+
+It starts from the latest generalist B and plays only against frozen copies of A: the newest A (around 950 updates, 80% of games) and A v738 (20%). It is not a general model: it is specialized only to beat our 2.6.
+
+| | Start | Now |
+|---|---|---|
+| Win rate against our Hog 2.6 | about 25% in its first games | **76%** |
+| Hero Ice Wizard ability, uses per game | 0.46 | **0.93** (doubled) |
+| Ability used at the right moment (enemy Hog Rider or other win condition next to its tower), per game | 0.01 | **0.04** (about 4x) |
+
+We are not happy with it yet: it still uses the Hero Ice Wizard freeze far too rarely at the right moment, and that ability is a big part of what makes this deck work. It now gets a strong reward each time it freezes a win condition next to its tower, and we are working on that before releasing it.
+
+When it's ready, the model will be uploaded here. After that, the roles flip: once this model is above about **85%** against our 2.6, A will train against it to learn how to beat it.
 
 **Conversion script.** The script we use to move models between card data versions (15.535 → 16.635) will be added, so older or community models can be compared fairly.
 
@@ -131,6 +147,22 @@ Most of the speed comes from the many CPU cores: every game runs on the CPU, and
 - Python 3.12 with PyTorch and a CUDA GPU.
 - The open-source V4 framework listed in `NOTICE`. The `royalefish/` package imports its `native_runner` modules.
 - **A native battle engine, which you have to supply yourself.** This repository does not include any game binaries, resources, modified clients or engines, and never will.
+
+### Source changes for a 16.635 engine
+
+Source code only, no game files, in the same spirit as the 15.535 probe sources published by FirstLight CR:
+
+| File | What it is |
+|---|---|
+| `patches/native_runner_16635.diff` | Python framework changes: 16.635 catalogs (123 cards, 453 unit archetypes, 26 ability slots), Minion Giant and Hero Ice Wizard support, relaxed identity checks. Apply on top of the FirstLight CR `native_runner/`. |
+| `patches/probe_x86_64_16635.diff` | Native probe changes against the FirstLight CR `native_runner/probe/`: x86_64 port (inline hooks in `x86_hook.h`, `native_call_x86_64.cpp` replacing the AArch64 assembly), generated x86 → ARM address tables (`logical_*.inc`), the hero ability fix (abilities were never offered: the charge check read the wrong field), resident multi-match engine and the `test_x86.cpp` host. |
+| `data_16635/` | The 16.635 card tables the models were trained on. Point `CR_COMPETITIVE_DATA_ROOT` here. |
+
+Notes:
+
+- The address tables match the x86_64 game library of the 16.635.1 build we use. A different build needs regenerated tables.
+- `test_x86.cpp` expects your own files in `./game_libs/`, `./game_assets/` and `./game_data/`. Nothing of that is included.
+- Build: clang++ from the Android NDK, target `x86_64-linux-android24`, as a shared library (`libcrprobe.so`) plus the host executable.
 
 The scripts are configured with command-line arguments and the `RF_*` environment variables in `royalefish/config.py`. Each script's `--help` lists its options.
 
