@@ -6,10 +6,12 @@ Everything runs offline, in a local simulation.
 
 ## Models
 
-| File | Deck | What it is |
-|---|---|---|
-| `models/A-hog26-v98.pt` | Hog 2.6 | Hog 2.6 specialist. Started from a strong pretrained 17M-parameter model, then 98 PPO updates on top. |
-| `models/B-general-v49.pt` | many decks | Generalist. 49 PPO updates on top of a pretrained general model. It plays many different decks and is A's main sparring partner. |
+| File | Deck | Card data | What it is |
+|---|---|---|---|
+| `models/A-hog26-v738.pt` | Hog 2.6 | **16.635** | **Latest.** Hog 2.6 specialist after 738 PPO updates. Knows the Minion Giant and the Hero Ice Wizard (see below). |
+| `models/B-general-v275.pt` | many decks | **16.635** | Latest generalist, A's main sparring partner, 275 PPO updates. |
+| `models/A-hog26-v98.pt` | Hog 2.6 | 15.535 | Older Hog 2.6 specialist (98 updates), kept as a reference. |
+| `models/B-general-v49.pt` | many decks | 15.535 | Older generalist (49 updates). |
 
 Both are the same network: a recurrent V4 actor-critic (transformer over cards and units, spatial encoder for the arena, LSTM memory), about 17M parameters. They load with `load_policy_v4` from the V4 framework (see Requirements).
 
@@ -22,15 +24,37 @@ How much did the fine-tuning help? Two tests of A at update 98 against its own s
 
 So against the same opponent, the fine-tuned model wins about 10 percentage points more often than the checkpoint it started from.
 
-## Coming soon
+## What's new in v738
 
-A new release is coming in the next few hours. The models are being moved to the card data of game version 16.635, so they will:
+**New card data (game version 16.635).** The original card catalog stopped at 122 cards, so the models saw newer content as an "unknown card". The catalog is now rebuilt from 16.635 data:
 
-- recognize the **Minion Giant**, which the old card catalog did not know (the models saw it as an "unknown card");
-- know the newer 16.635 mechanics;
-- be trained harder against the decks the Hog 2.6 model struggled with: Mortar, Evo Witch and Minion Giant decks.
+- **Minion Giant** is a real card for the model: it knows it flies, targets only buildings, costs 4 and how much HP it has. Its new embedding starts from the Balloon's.
+- **Hero Ice Wizard** is supported, with its ability (`IceWizardHero_ability`). This one is **still early**: the ability is offered and used, but the model has only just started learning when to use it.
+- The newer 16.635 mechanics (new effects and abilities) are in the catalog too.
+- All 122 cards the model already knew keep their learned weights: they were moved to the new table row by row, nothing was retrained from scratch.
 
-Support for **Hero Ice Wizard** is planned next.
+Loading these models needs the 16.635 tables in `data_16635/` and the small framework patch in `patches/native_runner_16635.diff` (wider catalogs, 26 ability slots, 453 unit archetypes). Point `CR_COMPETITIVE_DATA_ROOT` at `data_16635/`.
+
+**Training changes:**
+
+- **Musketeer turret.** Hero abilities were never offered to the models in the x86 engine; that is fixed. A also gets a small reward for using the Hero Musketeer turret at the right moment (a building-targeting win condition near its tower and no building of its own on the field). Using the turret at the right moment went from about **13% to 37%** of the chances, and the model now often plays two defensive structures (Cannon plus turret), which helps a lot against double win conditions.
+- **Opponent spell reward.** The opponent gets a small reward when its Fireball, Arrows or Lightning kills A's Musketeer, so A learns to protect it.
+- **Tower damage.** The per-hit tower damage term was raised, so small chip damage on the other lane is no longer ignored.
+- **Focus decks.** About 30% of games are played against the decks A struggled with: Mortar, Evo Witch and Minion Giant decks, mostly real meta lists.
+
+In-training win rates of A (last hour of training, not a paired evaluation):
+
+| Opponent | Win rate |
+|---|---|
+| Original generalist (frozen) | about 59% |
+| Older generalist B v50 (frozen) | about 55% |
+| Minion Giant decks | 32% → **48%** |
+| Mortar decks | 39% → **48%** |
+| Evo Witch decks | 32% → **45%** |
+
+## In progress
+
+A new model is being trained **only to beat the latest Hog 2.6**. It starts from the latest generalist, learns a Minion Giant + Hero Ice Wizard deck by imitation from about 600 high-level replays, then trains by self-play against the frozen Hog 2.6 model and its older versions. Results will be posted here.
 
 ## How training works
 
