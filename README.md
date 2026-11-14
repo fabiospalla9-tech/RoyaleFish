@@ -70,52 +70,55 @@ In-training win rates of A (last hour of training, not a paired evaluation):
 | Mortar decks | 39% → **48%** |
 | Evo Witch decks | 32% → **45%** |
 
-## Known weaknesses of A v738
+## A since v738: what was wrong and what changed
 
-Found by playing against the model. We are working on all of them right now.
+Weaknesses found by playing against v738, and where they stand now (numbers from training, A at around 1,300 updates):
 
-- **Wasting the only counter.** The biggest one. When A has a single card that answers two of the opponent's cards, it often spends it on the first, less dangerous threat, and then has nothing left for the real one. Examples: The Log on the Princess, then the Goblin Barrel hits the tower; the Cannon placed right at the bridge against Mega Knight + Witch, where it dies at once, then the Hog Rider comes in with nothing to stop it. (The original starting model had this problem even more clearly.)
-- **Log Bait.** Related to the point above: it does not keep The Log for the Goblin Barrel, and against the Evo Goblin Barrel on two lanes it tends to defend the tower with more HP instead of the weaker one.
-- **Ignoring damage on the other lane.** Sometimes it defends one lane perfectly and lets 1,500+ damage through on the other.
-- **Splash damage.** Against Witch / Evo Witch it places the Musketeer right next to its princess tower, so the splash hits both; against Sparky it groups Musketeer and Ice Golem together, and it uses Fireball on Sparky too rarely.
-- **Giant Skeleton.** It does not always stop the death bomb from reaching the tower.
-- **Musketeer turret.** It already uses it much more, but still not in every spot where it would be better than playing another card.
+| Problem | Status | Numbers |
+|---|---|---|
+| **Wasting the only counter** (Cannon thrown at the bridge on Mega Knight, then the Hog Rider walks in on the other lane) | **Improved** | When the opponent sends a second win condition on the other lane right after A's Cannon, A now holds that tower **45–50%** of the time, up from **26%**. The opponent is rewarded for trying exactly this, so A sees it a lot. |
+| **Wasted Musketeer turret** (activated with nothing in range, e.g. at the bridge) | **Fixed** | Turret activations with nothing to hit: about **4.4 → 0.6 per game**. Useful activations (something in range, including predicts like a Tesla about to land): about **4.7 per game**. The Cannon is not dropped: still about **5 per game**. |
+| **Fireball / Lightning taking two key cards** (Musketeer and Cannon next to each other) | **Improved** | Spells hitting Musketeer + Cannon together: **0.36 → 0.04 per game**. Ice Golem next to the Hog or the Musketeer is fine and is not counted. |
+| **Ignoring damage on the other lane** | **Improved** | Tower damage now weighs more in the reward (0.35 → 0.5) and the double-threat check above measures exactly this. |
+| **Log Bait** (Log spent before the Goblin Barrel) | **Improved, not solved** | Against our Log Bait model: 58% → **66–75%**. Against other Log Bait players it can still lose badly, so it stays on the list. |
+| **Musketeer turret at the right moment** | **Fixed** | 13% of the chances before v738 → about **45%**. |
+| **Fireball on high-value troops** (Princess, Evo Firecracker, Dart Goblin, Musketeer…) | **In progress** | New small reward when its Fireball kills them or leaves them almost dead. No reward for small troops like Skeletons. |
 
-How we are fixing them: see **Coming next** below.
+Still open: Lava Hound and Balloon pushes, the Minion Giant getting 3–4 hits on the tower, and the Evo Royal Giant.
+
+**What changed in training:** opponents are no longer frozen. A plays the generalist B, which **keeps learning** how to beat the current A, plus older versions of A and B picked at random every 10 minutes, plus mirror games. A frozen opponent can be "solved" by memorizing it; one that keeps learning keeps finding the holes.
 
 ## Coming next
 
-**New A (Hog 2.6), around 900–1,000 updates.** The strongest A so far in training. It will be posted here after a paired benchmark against v738. This run was built on the weaknesses above:
+**New A (Hog 2.6), around 1,300 updates (v1290).** Uploading soon, after a paired benchmark against v738.
 
-- **Log Bait model (L).** A separate model trained only to exploit A with Log Bait (it gets extra reward for a Goblin Barrel right after A's Log). A against L: about 58% → **66%**.
-- **More opponents.** A plays a league of frozen models instead of a single sparring partner: the latest generalist B (A: about 52% → **56%**, the hardest one), the Log Bait model, the original generalist, an older B, and a community X-Bow model (thanks Blade). A against that X-Bow model: 74% → about **82%**.
-- **Minion Giant, Mortar, Evo Witch decks.** Still 30% of games. Now around **50%** each (they started at 32–39%).
-- **Drills from real mistakes.** Moments where A failed (Log spent before the Goblin Barrel, Cannon thrown at the bridge before the Hog Rider) are replayed many times with small variations. A gets a reward if it gets through the next 20 seconds without tower damage, and a penalty if it doesn't.
-- **Musketeer turret.** Used at the right (useful) moment about **45%** of the chances, up from 32% at the start of this run and 13% before v738. It plays the turret much more, but the Cannon is not dropped: about **4 Cannons per game**, unchanged.
+**Frost (new model, in 1–2 days).** A model specialized in one deck:
 
-**Log Bait model (L): done for now.** Its job was to teach A to keep The Log for the Goblin Barrel, and it did (A against L: 58% → 66–69%). It may get its own specialization later.
+`knight-ev1`, `ice-wizard-hero`, `tesla-ev1`, `bats`, `minion-giant`, `skeletons`, `barbarian-barrel`, `fireball`
 
-**Anti-2.6 model (in training).** A model that plays one deck and is trained only to beat our Hog 2.6:
+It starts from our anti-2.6 model (which reached 81% against our 2.6) and now trains against the learning generalist B, older versions of A and B, and a small share of our 2.6. It gets rewarded for the parts of this deck that matter most:
 
-`minion-giant`, `ice-wizard-hero`, `barbarian-barrel`, `bats-ev1`, `cannon-ev1`, `knight`, `skeletons`, `lightning` (a Fireball variant is also played)
+- **Hero Ice Wizard freeze:** a reward when it freezes an incoming win condition (more if the freeze catches a whole push), nothing for freezing an Ice Golem alone, a penalty for freezing nothing.
+- **Tesla on defense:** a reward when the Tesla pulls a win condition and the tower takes no damage, a penalty when a win condition hits the tower while it has the Tesla in hand and the elixir to play it.
+- **Two win conditions in a row:** like A, it has to hold the second lane after spending its building.
 
-It starts from the latest generalist B and plays only against frozen copies of A: the newest A (around 950 updates, 80% of games) and A v738 (20%). It is not a general model: it is specialized only to beat our 2.6.
+First hours of training:
 
 | | Start | Now |
 |---|---|---|
-| Win rate against our Hog 2.6 | about 25% in its first games | **76%** |
-| Hero Ice Wizard ability, uses per game | 0.46 | **0.93** (doubled) |
-| Ability used at the right moment (enemy Hog Rider or other win condition next to its tower), per game | 0.01 | **0.04** (about 4x) |
-
-We are not happy with it yet: it still uses the Hero Ice Wizard freeze far too rarely at the right moment, and that ability is a big part of what makes this deck work. It now gets a strong reward each time it freezes a win condition next to its tower, and we are working on that before releasing it.
-
-When it's ready, the model will be uploaded here. After that, the roles flip: once this model is above about **85%** against our 2.6, A will train against it to learn how to beat it.
+| Freezes on a win condition, per game | 0.44 | **1.03** |
+| of which catching a whole push | 0.26 | **0.71** |
+| Wasted freezes, per game | 1.85 | **0.69** |
+| Tesla defenses that keep the tower clean | — | about **60%** |
+| Holding the second win condition | 48% | **56%** |
+| Against our 2.6 | — | about **60–75%** |
+| Against the learning generalist B | — | about **31–37%** (still the hard part) |
 
 **Conversion script.** The script we use to move models between card data versions (15.535 → 16.635) will be added, so older or community models can be compared fairly.
 
 ## How training works
 
-A trains against a league of models (earlier A and B trained against each other at the same time; now B is frozen and only A learns). The interesting part is how much data fits through one machine. On a single PC with an RTX 5060 Ti (for playing) and a Tesla V100 (for learning), the GPU learns from **about 2,100 complete games per hour**. Each update trains on **~55,000 decisions from ~64 full games** in a single optimizer step and takes about 70–90 seconds.
+A trains against a league: a generalist B that keeps learning at the same time, older versions of A and B, and mirror games. The interesting part is how much data fits through one machine. On a single PC with an RTX 5060 Ti (for playing) and a Tesla V100 (for learning), the system plays **about 2,500–3,000 complete games per hour**. Each update trains on **~55,000 decisions from ~64 full games** in a single optimizer step and takes about 70–90 seconds.
 
 That speed comes from a few changes:
 
@@ -127,7 +130,8 @@ That speed comes from a few changes:
 6. **Loader in a separate process** (`ever_loader.py`). The next group of games is decoded in another process and shared through memory while the GPU trains on the current group. Games are grouped by length, so very little compute goes to padding.
 7. **One big step per update.** Four groups of 16 games accumulate gradients, then one clipped optimizer step, which matches the size of the original large-scale PPO updates.
 8. **KL anchor.** A small KL term towards the starting checkpoint, computed on half of the groups, keeps the models from forgetting what they already know.
-9. **Opponent choice.** A league of frozen opponents, weighted towards the ones A still struggles against, plus focus decks, drills and 10% mirror games against A itself.
+9. **Opponent choice.** A learning opponent plus older versions, focus decks picked automatically from the cards A loses to most, drills and 10% mirror games.
+10. **NVIDIA MPS.** All model servers share the playing GPU at the same time instead of taking turns, which almost doubled the games per hour.
 
 ## Our machine
 
