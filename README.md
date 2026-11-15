@@ -97,6 +97,8 @@ Still open: Lava Hound and Balloon pushes, the Minion Giant getting 3–4 hits o
 
 **Imitation learning on fresh pro replays (next step).** We are collecting **November 2026 Hog 2.6 replays from top players**: mostly Path of Legends top 1,000 / Ultimate Champion players who play the 2.6, plus a few hand-picked strong 2.6 players. Only games where one side plays at least 7 of the 8 2.6 cards are kept. The collector runs slowly (one request every 10 seconds) so it stays within RoyaleAPI's limits. Once there are a few thousand games, A gets a round of imitation learning on them (more weight on the moments the pro actually plays a card), then reinforcement learning again. Progress will be measured on held-out November replays the model has never seen, not only on win rates against our own training opponents.
 
+**The replays will be public too.** When the collection is done (around 5,000–10,000 Hog 2.6 games), the whole set will be uploaded to Hugging Face so anyone can download it and use it as they like: a snapshot of the **mid-November 2026 meta** played by top players. Replay data comes from RoyaleAPI, which will be credited.
+
 **Frost (new model, in 1–2 days).** A model specialized in one deck:
 
 `knight-ev1`, `ice-wizard-hero`, `tesla-ev1`, `bats`, `minion-giant`, `skeletons`, `barbarian-barrel`, `fireball`
