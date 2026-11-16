@@ -61,13 +61,16 @@ What is fixed and what is not, from our own testing:
 - **Still open:** it attacks too little and almost never commits the Hog Rider, because this training only rewarded defense. Next round brings attack back without losing the defense.
 - **Still open:** its Fireball sometimes lands a bit behind moving troops (it aims where they are, not where they will be).
 
-**Release:** the new model will be uploaded here soon.
+**Release:** v1881 is out, see `models/A-hog26-v1881.pt` in the table below.
+
+**What's next:** we kept training up to v2112. It scored even higher on our ghost test (0.81), but in real games we liked v1881 more: some of v2112's plays were just bad, which tells us the ghost score alone doesn't catch everything. So the next round restarts from v1881, and every new version will also be tested against reacting opponents before it gets released.
 
 ## Models
 
 | File | Deck | Card data | What it is |
 |---|---|---|---|
-| `models/A-hog26-v738.pt` | Hog 2.6 | **16.635** | **Latest.** Hog 2.6 specialist after 738 PPO updates. Knows the Minion Giant and the Hero Ice Wizard (see below). |
+| `models/A-hog26-v1881.pt` | Hog 2.6 | **16.635** | **Latest.** The ghost-trained defender from the clips above: defends real human pushes far better than every previous version. Attacks less, that's next. |
+| `models/A-hog26-v738.pt` | Hog 2.6 | **16.635** | Previous Hog 2.6 specialist (738 PPO updates). Knows the Minion Giant and the Hero Ice Wizard (see below). |
 | `models/B-general-v275.pt` | many decks | **16.635** | Latest generalist, A's main sparring partner, 275 PPO updates. |
 | `models/A-hog26-v98.pt` | Hog 2.6 | 15.535 | Older Hog 2.6 specialist (98 updates), kept as a reference. |
 | `models/B-general-v49.pt` | many decks | 15.535 | Older generalist (49 updates). |
