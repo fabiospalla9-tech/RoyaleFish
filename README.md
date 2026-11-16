@@ -30,6 +30,16 @@ Everything runs offline, in a local simulation.
 
 On the right, v1881 faced **much heavier pushes** in its game, and still kept its towers.
 
+**Result of the two games:** v100 **lost a tower**. v1881 **never let a single troop touch its towers**: the only tower damage in its whole game came from spells (a Poison on the tower, −245, and a 25 HP chip in overtime).
+
+### RoyaleFish is not the original Everlight
+
+The models still say "Everlight" in the name because that is where they started, but what you see here is not the original model copied as it is:
+
+- **Retrained from the first weight to the last.** Compared to the Everlight checkpoint we started from, **99% of its 17.5 million weights have changed**.
+- **About 1,900 updates.** Each update is **64 full games** (around 45,000 decisions), so the model has learned from **more than 120,000 games** of reinforcement learning, plus the 52,632 human ghost attacks.
+- **The easiest way to tell them apart: the Musketeer's ability.** The original Everlight almost never uses it (in our logs the early versions used it **0 times per game**). RoyaleFish uses it as a normal part of its defense, **several times per game**, at the right moment.
+
 **What looks like a lost tower to you is just a calculation to it.**
 
 This is not a small update. The old A could play, but when a real push came it panicked: wrong card, wrong timing, tower gone. The new A treats every push like a math problem. It times the Cannon so the Golem breaks right on it, Logs the Witch at the exact moment, drops Skeletons and Ice Spirit to finish the job, and walks out of situations that looked lost. In the first clip the towers stay at **3052 / 3052** under non-stop spam.
