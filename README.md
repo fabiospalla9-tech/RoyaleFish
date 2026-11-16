@@ -245,3 +245,25 @@ If it's better, it goes in the table above and becomes the new baseline. Special
 ## License
 
 Apache-2.0. See `LICENSE` and `NOTICE`. Not affiliated with, endorsed by, or representative of Supercell.
+
+---
+
+## ⛔ NOT FOR RANKED, LADDER OR ANY ONLINE PLAY
+
+> [!CAUTION]
+> **RoyaleFish must never be used in the real game.** Not in ladder, not in Path of Legends, not in tournaments, not on any account, for any reason.
+>
+> - It is a **research project**: it plays only offline, in a local simulation, against other models or against you.
+> - Using an AI to play ranked games for you is **cheating**. It ruins the game for real people who are playing fair, and it breaks Supercell's Terms of Service.
+> - **I do not support it, I condemn it, and I take no responsibility** for anyone who tries.
+>
+> **If I find out that this AI is being used to climb the ladder (with the 2.6 or anything else), the project goes private for good.** No more updates, no more improvements, no more models released online. I will keep working on it privately, but nothing will ever be published again.
+
+### Do not contact me for:
+
+- **paying me** for models, accounts, boosting or anything else;
+- **the game engine** (it is not mine to share and it will not be shared);
+- **tools that read a phone's memory or play on a real device** in place of a player.
+
+**Messages like these will be blocked and reported.**
+
