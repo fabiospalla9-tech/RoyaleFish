@@ -37,7 +37,7 @@ On the right, v1881 faced **much heavier pushes** in its game, and still kept it
 The models still say "Everlight" in the name because that is where they started, but what you see here is not the original model copied as it is:
 
 - **Retrained from the first weight to the last.** Compared to the Everlight checkpoint we started from, **99% of its 17.5 million weights have changed**.
-- **About 1,900 updates.** Each update is **64 full games** (around 45,000 decisions), so the model has learned from **more than 120,000 games** of reinforcement learning, plus the 52,632 human ghost attacks.
+- **About 1,900 updates.** Each update is **64 full games** (around 45,000 decisions), so the model has learned from **more than 120,000 games** of reinforcement learning. Against the human ghosts alone it has already played **73,000+ games against 27,000+ different real attacks** (out of the 52,632 available).
 - **The easiest way to tell them apart: the Musketeer's ability.** The original Everlight almost never uses it (in our logs the early versions used it **0 times per game**). RoyaleFish uses it as a normal part of its defense, **several times per game**, at the right moment.
 
 **What looks like a lost tower to you is just a calculation to it.**
