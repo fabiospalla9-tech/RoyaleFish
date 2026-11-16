@@ -10,6 +10,38 @@ Everything runs offline, in a local simulation.
 > - Convert older models to 16.635 first (a conversion script is coming to this repo soon), then run both sides on a 16.635 native engine.
 > - Don't run the new models on an older engine/data version either. They were trained on the current balance (30+ card balance changes since the old data), so on old stats they play cards that no longer behave as they learned.
 
+## The next A is coming: it learned to defend from real humans
+
+<p align="center">
+  <img src="media/v1881-defending-the-impossible.gif" width="300" alt="A v1881 defending a non-stop push">
+  &nbsp;&nbsp;
+  <img src="media/v1881-triple-elixir-overtime.gif" width="300" alt="A v1881 in triple elixir overtime">
+</p>
+<p align="center"><sub>A v1881 (blue) vs our generalist B v278. Left: a non-stop push, towers untouched. Right: the last 40 seconds of triple elixir overtime. <a href="media/v1881-defense-hd.mp4">Watch the full clip in HD</a>.</sub></p>
+
+**What looks like a lost tower to you is just a calculation to it.**
+
+This is not a small update. The old A could play, but when a real push came it panicked: wrong card, wrong timing, tower gone. The new A treats every push like a math problem. It times the Cannon so the Golem breaks right on it, Logs the Witch at the exact moment, drops Skeletons and Ice Spirit to finish the job, and walks out of situations that looked lost. In the first clip the towers stay at **3052 / 3052** under non-stop spam.
+
+**How:** we took the full public replay set (252,238 matches) and kept the side that **won against a light cycle deck**, 52,632 real human attacks: 7,759 of them beat the Hog 2.6, the rest beat other light cycle decks, with extra weight on the 2.6 ones and on heavy decks (4.0+). Each of these attacks is replayed card by card, with the exact same hand order as in the real game, as a "ghost" opponent. A defends against the same ghost 4 times and is rewarded for doing better than its own other attempts, the training idea used by [vegetableleaf's ClashAI](https://github.com/vegetableleaf/ClashAI). 2,666 ghosts are never used in training and are kept only for testing.
+
+Measured on those **never-seen** human attacks:
+
+| Version | Defense score (1 = no tower damage) | Princess towers lost per game | Fully clean defenses |
+|---|---|---|---|
+| v1329 (before) | 0.53 | 0.47 | 11% |
+| **v1881 (new)** | **0.75** | **0.25** | **19%** |
+
+**About half the tower damage it used to take.** And it is still improving while training.
+
+What is fixed and what is not, from our own testing:
+
+- **Fixed:** collapsing against big pushes (Golem, Goblin Giant + Sparky, Dark Prince, spam in triple elixir). It now defends them cleanly most of the time.
+- **Still open:** it attacks too little and almost never commits the Hog Rider, because this training only rewarded defense. Next round brings attack back without losing the defense.
+- **Still open:** its Fireball sometimes lands a bit behind moving troops (it aims where they are, not where they will be).
+
+**Release:** the new model will be uploaded here soon.
+
 ## Models
 
 | File | Deck | Card data | What it is |
@@ -96,6 +128,8 @@ Still open: Lava Hound and Balloon pushes, the Minion Giant getting 3–4 hits o
 - **Ice Wizard / support troops thrown in front:** a small elixir-trade term, so losing a 3-4 elixir support troop for nothing costs something.
 
 **Imitation learning on fresh pro replays (next step).** We are collecting **November 2026 Hog 2.6 replays from top players**: mostly Path of Legends top 1,000 / Ultimate Champion players who play the 2.6, plus a few hand-picked strong 2.6 players. Only games where one side plays at least 7 of the 8 2.6 cards are kept. The collector runs slowly (one request every 10 seconds) so it stays within RoyaleAPI's limits. Once there are a few thousand games, A gets a round of imitation learning on them (more weight on the moments the pro actually plays a card), then reinforcement learning again. Progress will be measured on held-out November replays the model has never seen, not only on win rates against our own training opponents.
+
+**Update (16 Nov 2026): RoyaleAPI closed replay access for everyone.** Replays now need a Discord login and a special access request form, reviewed by hand, with no idea how long it takes or who gets accepted. Our collection stopped at a few hundred November games, so the imitation step is on hold and the Hugging Face upload is postponed.
 
 **The replays will be public too.** When the collection is done (around 5,000–10,000 Hog 2.6 games), the whole set will be uploaded to Hugging Face so anyone can download it and use it as they like: a snapshot of the **mid-November 2026 meta** played by top players. Replay data comes from RoyaleAPI, which will be credited.
 
