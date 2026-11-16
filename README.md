@@ -19,6 +19,17 @@ Everything runs offline, in a local simulation.
 </p>
 <p align="center"><sub>A v1881 (blue) vs our generalist B v278. Left: a non-stop push, towers untouched. Right: the last 40 seconds of triple elixir overtime. <a href="media/v1881-defense-hd.mp4">Watch the full clip in HD</a>.</sub></p>
 
+### Before and after, side by side
+
+<p align="center">
+  <img src="media/v100-vs-v1881.gif" width="560" alt="A v100 (left) vs A v1881 (right) against the same opponent">
+</p>
+<p align="center"><sub>Left: the old A v100. Right: the new A v1881. Both against our generalist model B v278. <a href="media/v100-vs-v1881-hd.mp4">Watch in HD</a>.</sub></p>
+
+**Keep in mind what v100 already was.** It comes from Everlight, it was trained with imitation learning on **6,500 human Hog 2.6 replays**, then **134 updates** of reinforcement learning (Everlight RL), then **100 more** of our own: about **234 RL updates on top of 6,500 pro games**. And still, in the clip on the left it puts the Cannon in the wrong spot, the Elixir Golem walks straight to the tower, and in overtime it loses a tower. That tells you how far the original Everlight was from playing well.
+
+On the right, v1881 faced **much heavier pushes** in its game, and still kept its towers.
+
 **What looks like a lost tower to you is just a calculation to it.**
 
 This is not a small update. The old A could play, but when a real push came it panicked: wrong card, wrong timing, tower gone. The new A treats every push like a math problem. It times the Cannon so the Golem breaks right on it, Logs the Witch at the exact moment, drops Skeletons and Ice Spirit to finish the job, and walks out of situations that looked lost. In the first clip the towers stay at **3052 / 3052** under non-stop spam.
