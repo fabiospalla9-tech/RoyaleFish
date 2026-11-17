@@ -19,7 +19,7 @@ Everything runs offline, in a local simulation.
 
 **The Hog never touches the tower.**
 
-People shared a clip of an AI body-blocking a Hog Rider with just Ice Golem and Skeletons, so we tested it on the offline engine. First a brute-force search: the engine tried 88,000 Golem + Skeleton placements and timings against a lone Hog. About 0.3% of them stop it with zero damage, and every one of those repeated 10 out of 10 times. The trick is real, and it is frame-tight.
+People shared a clip of an AI body-blocking a Hog Rider with just Ice Golem and Skeletons, so we tested it on the offline engine. First a brute-force search: the engine tried 88,000 Golem + Skeleton placements and timings against a lone Hog. About 0.3% of them stop it with zero damage, and all 213 we re-tested repeated it 10 out of 10 times. The trick is real, and it is frame-tight.
 
 Then we trained A on a drill: one Hog at the bridge, only those two cards in hand, minus one point for every hit on the tower. Nobody gave it the coordinates. It found its own block: Skeletons in front of the tower about 1.2 s after the Hog is placed, then the Ice Golem right behind them. On the right bridge it now gets zero damage in about 1 drill out of 6, and only one hit in most of the others. The left bridge is still being learned, because the engine is not mirror-symmetric and the right-side block does not work there.
 
