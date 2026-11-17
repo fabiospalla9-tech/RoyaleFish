@@ -10,6 +10,19 @@ Everything runs offline, in a local simulation.
 > - Convert older models to 16.635 first (a conversion script is coming to this repo soon), then run both sides on a 16.635 native engine.
 > - Don't run the new models on an older engine/data version either. They were trained on the current balance (30+ card balance changes since the old data), so on old stats they play cards that no longer behave as they learned.
 
+## Only 2 cards: Ice Golem + Skeletons vs Hog Rider, 0 damage
+
+<p align="center">
+  <img src="media/only-2-cards.gif" width="320" alt="Our AI blocks a Hog Rider with only Ice Golem and Skeletons, the tower takes no damage">
+</p>
+<p align="center"><sub>Our Hog 2.6 model (A v3782) with only Ice Golem and Skeletons playable. <a href="media/only-2-cards-hd.mp4">Watch in HD</a>.</sub></p>
+
+**The Hog never touches the tower.**
+
+People shared a clip of an AI body-blocking a Hog Rider with just Ice Golem and Skeletons, so we tested it on the offline engine. First a brute-force search: the engine tried 88,000 Golem + Skeleton placements and timings against a lone Hog. About 0.3% of them stop it with zero damage, and every one of those repeated 10 out of 10 times. The trick is real, and it is frame-tight.
+
+Then we trained A on a drill: one Hog at the bridge, only those two cards in hand, minus one point for every hit on the tower. Nobody gave it the coordinates. It found its own block: Skeletons in front of the tower about 1.2 s after the Hog is placed, then the Ice Golem right behind them. On the right bridge it now gets zero damage in about 1 drill out of 6, and only one hit in most of the others. The left bridge is still being learned, because the engine is not mirror-symmetric and the right-side block does not work there.
+
 ## 2 vs 1: two generalist AIs against one 2.6
 
 <p align="center">
