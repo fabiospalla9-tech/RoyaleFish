@@ -10,6 +10,21 @@ Everything runs offline, in a local simulation.
 > - Convert older models to 16.635 first (a conversion script is coming to this repo soon), then run both sides on a 16.635 native engine.
 > - Don't run the new models on an older engine/data version either. They were trained on the current balance (30+ card balance changes since the old data), so on old stats they play cards that no longer behave as they learned.
 
+## 2 vs 1: two generalist AIs against one 2.6
+
+<p align="center">
+  <img src="media/2v1-overtime.gif" width="320" alt="Two B models spamming against one A on the same arena">
+</p>
+<p align="center"><sub>Two generalist B v278 models (top) against our single Hog 2.6 model (bottom, latest checkpoint A v2077). <a href="media/2v1-overtime-hd.mp4">Watch in HD</a>.</sub></p>
+
+**Two minds attacking. One defending.**
+
+We modified the offline engine so that **two generalist B models play on the same side**, on a normal 18x32 arena, against our single Hog 2.6 model. Both B's played the same spam deck (Elixir Golem, Evo Witch, Evo Electro Dragon).
+
+The only advantage our AI gets is elixir: each B gets 1x and ours 2x, and in the last minute each B gets 2x and ours 3x. More than each of them, never more than both combined. With the same elixir as each opponent, holding two full pushes at once would be mathematically impossible.
+
+In overtime both B's sent everything at once. The tower went from **1639 to 910**, and it held.
+
 ## The next A is coming: it learned to defend from real humans
 
 <p align="center">
