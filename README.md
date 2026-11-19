@@ -38,7 +38,7 @@ The only advantage our AI gets is elixir: each B gets 1x and ours 2x, and in the
 
 In overtime both B's sent everything at once. The tower went from **1639 to 910**, and it held.
 
-## The next A is coming: it learned to defend from real humans
+## A v1881: it learned to defend from real humans
 
 <p align="center">
   <img src="media/v1881-defending-the-impossible.gif" width="300" alt="A v1881 defending a non-stop push">
@@ -91,123 +91,53 @@ What is fixed and what is not, from our own testing:
 
 **Release:** v1881 is out, see `models/A-hog26-v1881.pt` in the table below.
 
-**What's next:** we kept training up to v2112. It scored even higher on our ghost test (0.81), but in real games we liked v1881 more: some of v2112's plays were just bad, which tells us the ghost score alone doesn't catch everything. So the next round restarts from v1881, and every new version will also be tested against reacting opponents before it gets released.
+## Update (19 Nov 2026): the next A, coming soon
+
+### What was wrong with v1881 (and the versions right after it)
+
+Found by playing against it and from the training logs:
+
+- **Wasted Cannons.** It often dropped the Cannon early, with no win condition coming. In the versions trained after v1881 this reached about **5 wasted Cannons per game**, and opponents learned to spell them.
+- **Almost no attack.** The ghost training only rewarded defense, so it rarely committed the Hog Rider: about **0.9 Hog Riders per game**.
+- **Fireball on cheap troops in its own half.** For example a half-HP Ice Wizard that already crossed the bridge, where Cannon, Musketeer or Skeletons would do the job. An old reward paid it for killing support troops anywhere, so we were teaching it that.
+- **Fireball behind moving troops** (it aims where they are, not where they will be).
+
+### What the new A does better
+
+Numbers from training against our generalist B (frozen, light modern decks):
+
+| | Before | Now |
+|---|---|---|
+| Wasted Cannons per game | about 5 | **about 1** |
+| Cannons used on a win condition per game | – | **3.75** |
+| Hog Riders played per game | 0.9 | **3.8** (about 2 tower hits) |
+| Win rate against B | 12% | **42%** |
+
+**The key fix was where the reward lands.** Whether a Cannon was useful is only known when it disappears, up to 30 seconds later. The reward used to arrive at that moment, about 120 decisions after the Cannon was played, so almost nothing of it reached the actual decision. Now the reward is written back **on the exact move that played the Cannon**: +1.5 if a win condition came into its range, −1.5 if it was wasted. The same idea is now being used for the Fireball: a reward for hitting support troops (Ice Wizard, Magic Archer, Princess…) in the opponent's half, a small penalty for a Fireball in its own half that destroys less than 4 elixir of troops (unless it is overtime or its tower is almost down).
+
+From our own games against it: it now uses the Cannon in the right spots, defends Mortar decks well, and in the 2.6 mirror it tracks your cycle, for example Logging your Skeletons before you even play them.
+
+**Not ready yet:** its defense score on never-seen human ghosts is **0.67-0.68** right now, below v1881's 0.75, because the last rounds focused on the Cannon. It will be released when that is back to at least v1881's level, so the new version is better everywhere and not just in attack.
+
+### Coming next
+
+1. **Defense on human ghosts** back to 0.72-0.75 or more.
+2. **Fireball** only where it makes sense (training now).
+3. **More Hog Rider pressure**, also in the first 2 minutes, including using the Hog to pull troops.
+4. **Skeletons + Ice Spirit against the Hog Rider at the right frame**: brute force on the engine first, like the Ice Golem + Skeletons search, then training from the placements that work.
+5. **Conversion script** (15.535 → 16.635), so older or community models can be compared fairly.
+
 
 ## Models
 
 | File | Deck | Card data | What it is |
 |---|---|---|---|
 | `models/A-hog26-v1881.pt` | Hog 2.6 | **16.635** | **Latest.** The ghost-trained defender from the clips above: defends real human pushes far better than every previous version. Attacks less, that's next. |
-| `models/A-hog26-v738.pt` | Hog 2.6 | **16.635** | Previous Hog 2.6 specialist (738 PPO updates). Knows the Minion Giant and the Hero Ice Wizard (see below). |
 | `models/B-general-v275.pt` | many decks | **16.635** | Latest generalist, A's main sparring partner, 275 PPO updates. |
-| `models/A-hog26-v98.pt` | Hog 2.6 | 15.535 | Older Hog 2.6 specialist (98 updates), kept as a reference. |
-| `models/B-general-v49.pt` | many decks | 15.535 | Older generalist (49 updates). |
 
 Both are the same network: a recurrent V4 actor-critic (transformer over cards and units, spatial encoder for the arena, LSTM memory), about 17M parameters. They load with `load_policy_v4` from the V4 framework (see Requirements).
 
-How much did the fine-tuning help? Two tests of A at update 98 against its own starting checkpoint:
-
-| Test | Games | A v98 | Starting checkpoint |
-|---|---|---|---|
-| Head to head (each side plays Hog 2.6 in turn, the other plays varied decks) | 1,056 | **54.3%** | 45.7% |
-| Both play Hog 2.6 against the same opponent (the original generalist, same deck sequence) | 600 / 561 | **59.7%** win rate | 49.6% win rate |
-
-So against the same opponent, the fine-tuned model wins about 10 percentage points more often than the checkpoint it started from.
-
-Later versions, same test (both play Hog 2.6 against the original generalist, same deck sequence):
-
-| Model | Games | Win rate vs original generalist |
-|---|---|---|
-| Starting checkpoint | 561 | 49.6% |
-| A v98 | 668 | 61.2% |
-| A v357 | 668 | **73.1%** |
-
-A v357 more than doubled the gain over the starting checkpoint (+23.5 points, against +11.6 for v98).
-
-**A v738, measured:** both sides play Hog 2.6, A v738 against the original model it started from, sides swapped: **71.9% (±2.6) over 1,147 games**.
-
-## What's new in v738
-
-**New card data (game version 16.635).** The original card catalog stopped at 122 cards, so the models saw newer content as an "unknown card". The catalog is now rebuilt from 16.635 data:
-
-- **Minion Giant** is a real card for the model: it knows it flies, targets only buildings, costs 4 and how much HP it has. Its new embedding starts from the Balloon's.
-- **Hero Ice Wizard** is supported, with its ability (`IceWizardHero_ability`). This one is **still early**: the ability is offered and used, but the model has only just started learning when to use it.
-- The newer 16.635 mechanics (new effects and abilities) are in the catalog too.
-- All 122 cards the model already knew keep their learned weights: they were moved to the new table row by row, nothing was retrained from scratch.
-
-Loading these models needs the 16.635 tables in `data_16635/` and the small framework patch in `patches/native_runner_16635.diff` (wider catalogs, 26 ability slots, 453 unit archetypes). Point `CR_COMPETITIVE_DATA_ROOT` at `data_16635/`.
-
-**Training changes:**
-
-- **Musketeer turret.** Hero abilities were never offered to the models in the x86 engine; that is fixed. A also gets a small reward for using the Hero Musketeer turret at the right moment (a building-targeting win condition near its tower and no building of its own on the field).
-- **Opponent spell reward.** The opponent gets a small reward when its Fireball, Arrows or Lightning kills A's Musketeer, so A learns to protect it.
-- **Tower damage.** The per-hit tower damage term was raised, so small chip damage on the other lane is no longer ignored.
-- **Focus decks.** About 30% of games are played against the decks A struggled with: Mortar, Evo Witch and Minion Giant decks, mostly real meta lists.
-
-In-training win rates of A (last hour of training, not a paired evaluation):
-
-| Opponent | Win rate |
-|---|---|
-| Original generalist (frozen) | about 59% |
-| Older generalist B v50 (frozen) | about 55% |
-| Minion Giant decks | 32% → **48%** |
-| Mortar decks | 39% → **48%** |
-| Evo Witch decks | 32% → **45%** |
-
-## A since v738: what was wrong and what changed
-
-Weaknesses found by playing against v738, and where they stand now (numbers from training, A at around 1,300 updates):
-
-| Problem | Status | Numbers |
-|---|---|---|
-| **Wasting the only counter** (Cannon thrown at the bridge on Mega Knight, then the Hog Rider walks in on the other lane) | **Improved** | When the opponent sends a second win condition on the other lane right after A's Cannon, A now holds that tower **45–50%** of the time, up from **26%**. The opponent is rewarded for trying exactly this, so A sees it a lot. |
-| **Wasted Musketeer turret** (activated with nothing in range, e.g. at the bridge) | **Fixed** | Turret activations with nothing to hit: about **4.4 → 0.6 per game**. Useful activations (something in range, including predicts like a Tesla about to land): about **4.7 per game**. The Cannon is not dropped: still about **5 per game**. |
-| **Fireball / Lightning taking two key cards** (Musketeer and Cannon next to each other) | **Improved** | Spells hitting Musketeer + Cannon together: **0.36 → 0.04 per game**. Ice Golem next to the Hog or the Musketeer is fine and is not counted. |
-| **Ignoring damage on the other lane** | **Improved** | Tower damage now weighs more in the reward (0.35 → 0.5) and the double-threat check above measures exactly this. |
-| **Log Bait** (Log spent before the Goblin Barrel) | **Improved, not solved** | Against our Log Bait model: 58% → **66–75%**. Against other Log Bait players it can still lose badly, so it stays on the list. |
-| **Musketeer turret at the right moment** | **Fixed** | 13% of the chances before v738 → about **45%**. |
-| **Fireball on high-value troops** (Princess, Evo Firecracker, Dart Goblin, Musketeer…) | **In progress** | New small reward when its Fireball kills them or leaves them almost dead. No reward for small troops like Skeletons. |
-
-Still open: Lava Hound and Balloon pushes, the Minion Giant getting 3–4 hits on the tower, and the Evo Royal Giant.
-
-**What changed in training:** opponents are no longer frozen. A plays the generalist B, which **keeps learning** how to beat the current A, plus older versions of A and B picked at random every 10 minutes, plus mirror games. A frozen opponent can be "solved" by memorizing it; one that keeps learning keeps finding the holes.
-
-## Coming next
-
-**New A (Hog 2.6), around 1,300 updates (v1290).** Uploading soon. Fixes from testing it are being added now, for example:
-
-- **Musketeer turret against the Hog Rider:** reward it only when the Hog Rider actually targets the turret, and penalize activating it when a win condition is already hitting the tower (too late to pull it).
-- **Ice Wizard / support troops thrown in front:** a small elixir-trade term, so losing a 3-4 elixir support troop for nothing costs something.
-
-**Imitation learning on fresh pro replays (next step).** We are collecting **November 2026 Hog 2.6 replays from top players**: mostly Path of Legends top 1,000 / Ultimate Champion players who play the 2.6, plus a few hand-picked strong 2.6 players. Only games where one side plays at least 7 of the 8 2.6 cards are kept. The collector runs slowly (one request every 10 seconds) so it stays within RoyaleAPI's limits. Once there are a few thousand games, A gets a round of imitation learning on them (more weight on the moments the pro actually plays a card), then reinforcement learning again. Progress will be measured on held-out November replays the model has never seen, not only on win rates against our own training opponents.
-
-**Update (16 Nov 2026): RoyaleAPI closed replay access for everyone.** Replays now need a Discord login and a special access request form, reviewed by hand, with no idea how long it takes or who gets accepted. Our collection stopped at a few hundred November games, so the imitation step is on hold and the Hugging Face upload is postponed.
-
-**The replays will be public too.** When the collection is done (around 5,000–10,000 Hog 2.6 games), the whole set will be uploaded to Hugging Face so anyone can download it and use it as they like: a snapshot of the **mid-November 2026 meta** played by top players. Replay data comes from RoyaleAPI, which will be credited.
-
-**Frost (new model, in 1–2 days).** A model specialized in one deck:
-
-`knight-ev1`, `ice-wizard-hero`, `tesla-ev1`, `bats`, `minion-giant`, `skeletons`, `barbarian-barrel`, `fireball`
-
-It starts from our anti-2.6 model (which reached 81% against our 2.6) and now trains against the learning generalist B, older versions of A and B, and a small share of our 2.6. It gets rewarded for the parts of this deck that matter most:
-
-- **Hero Ice Wizard freeze:** a reward when it freezes an incoming win condition (more if the freeze catches a whole push), nothing for freezing an Ice Golem alone, a penalty for freezing nothing.
-- **Tesla on defense:** a reward when the Tesla pulls a win condition and the tower takes no damage, a penalty when a win condition hits the tower while it has the Tesla in hand and the elixir to play it.
-- **Two win conditions in a row:** like A, it has to hold the second lane after spending its building.
-
-First hours of training:
-
-| | Start | Now |
-|---|---|---|
-| Freezes on a win condition, per game | 0.44 | **1.03** |
-| of which catching a whole push | 0.26 | **0.71** |
-| Wasted freezes, per game | 1.85 | **0.69** |
-| Tesla defenses that keep the tower clean | — | about **60%** |
-| Holding the second win condition | 48% | **56%** |
-| Against our 2.6 | — | about **60–75%** |
-| Against the learning generalist B | — | about **31–37%** (still the hard part) |
-
-**Conversion script.** The script we use to move models between card data versions (15.535 → 16.635) will be added, so older or community models can be compared fairly.
+Older models (A v98, A v738, B v49) are still in the git history. For reference, A v738 beat the checkpoint it started from **71.9% (±2.6) over 1,147 games** (both sides Hog 2.6, sides swapped).
 
 ## How training works
 
