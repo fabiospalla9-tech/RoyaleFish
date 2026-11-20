@@ -220,6 +220,25 @@ Apache-2.0. See `LICENSE` and `NOTICE`. Not affiliated with, endorsed by, or rep
 >
 > **If I find out that this AI is being used to climb the ladder (with the 2.6 or anything else), the project goes private for good.** No more updates, no more improvements, no more models released online. I will keep working on it privately, but nothing will ever be published again.
 
+### It does not even work online
+
+Besides being cheating, **there is no point in trying it in the real game: it plays badly there.** We tested it in friendly battles and in the Training Camp with a real phone, and it lost even against the in-game bot.
+
+The models only work in the environment they were trained in. Offline, the model plays inside the same native engine and receives its inputs from the same code used for training. On a real phone the game state has to be rebuilt from the outside, and we measured, field by field, how different that picture is:
+
+| What the model receives | Training / offline | Real phone |
+|---|---|---|
+| Opponent card cycle (which cards are back in hand, abilities ready) | present in 87% of decisions | missing |
+| Your own revealed cards | present in 77% | missing |
+| Events (spawns, deaths, hits) | in 2% of decisions | in 55%, a kind of input the model never saw |
+| Active effects (freeze, rage, poison...) | present | missing |
+| Elixir reserved for cards on the way | present | missing |
+| Evolution cycle of your own cards | never | present |
+| Opponent tower troop | always Princess | Dagger Duchess and others |
+| Delay from decision to card on the field | about 1.1 s | about 1.85 s |
+
+With so many differences the model sees a game it never learned, and its decisions fall apart: Fireballs that land after the troops have moved, defenses that arrive late, a Hog Rider almost never played. **RoyaleFish is an offline project and stays offline.**
+
 ### Do not contact me for:
 
 - **paying me** for models, accounts, boosting or anything else;
