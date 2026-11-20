@@ -1,7 +1,7 @@
 # RoyaleFish
 
 > [!CAUTION]
-> **Il progetto è finito per sempre per colpa del fallito di Claude che non sa fare niente.**
+> **This project is over forever, because of that failure Claude, who can't do anything right.**
 
 An open, community-driven Clash Royale AI. The idea is simple: something like Stockfish, but for Clash Royale. A strong engine that anyone can download, play against, study and make stronger. When someone trains a better model, it gets added here and becomes the new baseline for everyone.
 
