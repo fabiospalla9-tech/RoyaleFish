@@ -132,7 +132,8 @@ From our own games against it: it now uses the Cannon in the right spots, defend
 
 | File | Deck | Card data | What it is |
 |---|---|---|---|
-| `models/A-hog26-v1881.pt` | Hog 2.6 | **16.635** | **Latest.** The ghost-trained defender from the clips above: defends real human pushes far better than every previous version. Attacks less, that's next. |
+| `models/A-hog26-v995.pt` | Hog 2.6 | **16.635** | **Latest (offline).** Fine-tuned from the ghost defender: uses the Cannon well (4.67 good / 0.55 wasted per game), Fireball on support troops (2.36 good / 0.19 wasted), plays the Hog Rider more (5.7 per game) and keeps ghost defense at 0.71 on attacks it never saw. Offline only. |
+| `models/A-hog26-v1881.pt` | Hog 2.6 | **16.635** | Previous release. The ghost-trained defender from the clips above: defends real human pushes far better than every previous version. Attacks less, that's next. |
 | `models/B-general-v275.pt` | many decks | **16.635** | Latest generalist, A's main sparring partner, 275 PPO updates. |
 
 Both are the same network: a recurrent V4 actor-critic (transformer over cards and units, spatial encoder for the arena, LSTM memory), about 17M parameters. They load with `load_policy_v4` from the V4 framework (see Requirements).
