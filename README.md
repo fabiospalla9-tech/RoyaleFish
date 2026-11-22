@@ -6,65 +6,17 @@ Everything runs offline, in a local simulation.
 
 ## New model in training (22 Nov 2026)
 
-**A new generation is being trained from random weights.** It uses no earlier RoyaleFish or FirstLight checkpoint. It is still in training and is not published yet.
+A new generation is training **from random weights**, with no earlier checkpoint: first on real replays, then in a self-play league. It is not published yet.
 
-There are two networks of **12.67 million parameters** each:
-
-- **A:** a Hog 2.6 specialist.
-- **B:** a generalist that plays the current meta.
-
-### Training time so far
-
-| Step | Compute time |
+| | |
 |---|---|
-| Imitation learning of B, from random weights | 3.7 h |
-| Imitation learning of A, starting from B | 26 min |
-| Self-play league, A and B together | 7.8 h |
-| **Total** | **about 12.3 h** |
+| Models | Hog 2.6 specialist and meta generalist, 12.67M parameters each |
+| Compute so far | **about 12.3 hours** (replay conversion not included) |
+| Self-play games | **about 150,000** |
+| Opponents | 358 meta decks from November 2026, all 123 ladder cards, 44 Evolutions, 18 Heroes |
+| Test, 1,000 games vs a frozen older model | **47.6% before self-play, 62.7% after 103,424 games** (± 3) |
 
-This does not count converting the replays, or a 3 h 20 min power cut. Hardware: one Tesla V100 and one RTX 5060 Ti. The league has played **about 150,000 games** so far, at about 21,000 games per hour, and every collected decision goes through the optimizer.
-
-### How it is trained
-
-- **Imitation first**, on real replays rebuilt in the open-source [RoyaleSim](https://github.com/RoyaleGym/RoyaleSim) simulator.
-- **Then a self-play league** on RoyaleSim 0.1.55 with the 16.635 card table. A and B play each other, their own past versions and a frozen older model.
-- **358 meta decks from November 2026**, covering all 123 ladder cards, 44 Evolutions and 18 Heroes.
-- **Matchmaking:** about 40% of opponent decks come from the deck families the model is currently losing to.
-- **What the model sees:** every unit, real Evo and Hero forms, spells in flight, the Evo cycle, ability buttons and the whole match history. Opponent cards appear only after they land, and its own commands take the game's 1 second delay.
-
-### Results so far
-
-**Fixed test: 1,000 Hog 2.6 mirror games against a frozen older model, on the 16.635 cards, with seeds not used in training.**
-
-| Model | Win rate | Tower damage dealt per game | Tower damage taken per game |
-|---|---|---|---|
-| A before self-play | 47.6% ± 3.1 | 7,269 | 7,462 |
-| **A after 103,424 self-play games** | **62.7% ± 3.0** | **9,149** | 8,152 |
-
-**Imitation learning, on replays not used for training:**
-
-| Metric | A | B |
-|---|---|---|
-| Correct card | 64.9% | 64.2% |
-| Exact placement cell (top 1) | 32.6% | 30.3% |
-| Placement in the top 5 cells | 65.8% | 65.8% |
-
-**Hero abilities, learned in self-play (last 16 training rounds, average per game):**
-
-| Ability | Uses | Useful uses |
-|---|---|---|
-| Hero Musketeer turret (A), pulling a win condition | 3.03 | 2.07 |
-| Hero Ice Wizard cube (B), freezing a win condition or 2+ troops | 0.54 | 0.40 |
-| Hero Electro Wizard surge (B), stopping a win condition or 2+ troops | 0.22 | 0.18 |
-
-### Limits
-
-- The frozen opponent in the fixed test is also in the training pool, so **62.7% can overstate general strength**.
-- The new models **have not yet been measured against v995** or in a large test against human players.
-- Training runs in a simulator, which is close to the real game but not identical.
-- Clash Royale is not chess: some decks hard-counter others. In training, the Hog 2.6 model wins only about 11% against Furnace + Graveyard decks. Better play can narrow a bad matchup, but it cannot remove it.
-
-**It will be published here once it is strong enough.**
+That older model is also in the training pool, so 62.7% can overstate general strength. The new models have not been measured against v995 yet.
 
 ## Models (previous generation)
 
