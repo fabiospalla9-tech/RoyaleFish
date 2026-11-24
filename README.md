@@ -24,6 +24,8 @@ B studied an older replay dataset, about 3-4 months behind the meta. The new [No
 
 **Replay conversion for the offline engine: [conversion/](conversion/README.md).**
 
+**Reinforcement learning, league and rewards: [training/](training/README.md).**
+
 ## Models (previous generation)
 
 | File | Deck | Card data | What it is |

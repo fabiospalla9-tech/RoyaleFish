@@ -118,7 +118,7 @@ Minion Giant 2.8 on 364 unseen games:
 
 ### Step 2: self-play league
 
-Each round plays 256 games and updates the models with a PPO-style method. Opponents are mixed to avoid overfitting to a single rival:
+The code is in [`training/`](../training/README.md). Each round plays 256 games and updates the models with a PPO-style method. Opponents are mixed to avoid overfitting to a single rival:
 
 | Share | Match |
 |---|---|
