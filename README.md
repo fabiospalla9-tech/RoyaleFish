@@ -6,6 +6,9 @@ Everything runs offline, in a local simulation.
 
 ## New models (24 Nov 2026)
 
+> [!WARNING]
+> **Known issue (24 Nov 2026): the published 12.67M models were trained without the intended command delay.** Because of a bug in `training/rl_env.py`, the delay was set after the battle reset, so RoyaleSim ignored it and cards landed after 1 tick instead of about 1 second. Imitation learning on replays is not affected. All win rates below were measured under the same bug. With a real 1 s delay on its side only, the Minion Giant 2.8 drops from 68.2% to 56.5% against the frozen generalist. **A fix and retraining are in progress.**
+
 A new generation trained **from random weights**, with no earlier checkpoint: first on real high-ladder replays, then in a self-play league in RoyaleSim at about **23,000-30,000 games per hour**. From random weights to the published Furnace specialist took **about 40 hours**.
 
 | File | Role | Replays | Self-play games | Win rate vs frozen B (400 games) |
