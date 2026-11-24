@@ -105,7 +105,7 @@ During training, both specialists regularly played a frozen older **12.6M-parame
 
 ### Step 1: imitation learning
 
-Each model first studies human replays. Specialists start from B with learning rate 1e-4 for 3 epochs, plus an "elastic" penalty of 0.3 that keeps them close to their starting point. Validation always uses games the model has never seen.
+Each model first studies human replays, converted to simulator states with the [conversion pipeline](../conversion/README.md). Specialists start from B with learning rate 1e-4 for 3 epochs, plus an "elastic" penalty of 0.3 that keeps them close to their starting point. Validation always uses games the model has never seen.
 
 Minion Giant 2.8 on 364 unseen games:
 
