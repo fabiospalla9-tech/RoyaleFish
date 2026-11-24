@@ -5,7 +5,7 @@ This document describes the three models published on 24 November 2026, how they
 **These models are for offline research only.** They must never be used in the real game. See the warning in the main README.
 
 > [!WARNING]
-> **Known issue (24 Nov 2026): the published 12.67M models were trained without the intended command delay.** Because of a bug in `training/rl_env.py`, the delay was set after the battle reset, so RoyaleSim ignored it and cards landed after 1 tick instead of about 1 second. Imitation learning on replays is not affected. All win rates below were measured under the same bug. With a real delay on its side only, the Minion Giant 2.8 drops from 68.2% against the frozen generalist to 56.5% with 1 s and to 36.2% with 1.5 s (400 games each). **A fix and retraining are in progress.**
+> **Known issue (24 Nov 2026): the published 12.67M models were trained without the intended command delay.** Because of a bug in `training/rl_env.py`, the delay was set after the battle reset, so RoyaleSim ignored it and cards landed after 1 tick instead of about 1 second. Imitation learning on replays is not affected. All win rates below were measured under the same bug. Against the frozen generalist, the Minion Giant 2.8 wins 68.2% with no delay (the bug) and 36.2% with a real 1.5 s delay on its side only (400 games each). **A fix and retraining are in progress.**
 
 ## 1. The three models
 
