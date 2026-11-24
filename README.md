@@ -4,19 +4,23 @@ A Clash Royale AI built from scratch by an independent developer. The idea is si
 
 Everything runs offline, in a local simulation.
 
-## New model in training (22 Nov 2026)
+## New models (24 Nov 2026)
 
-A new generation is training **from random weights**, with no earlier checkpoint: first on real replays, then in a self-play league. It is not published yet.
+A new generation trained **from random weights**, with no earlier checkpoint: first on real high-ladder replays, then in a self-play league in RoyaleSim at about **23,000-30,000 games per hour**. From random weights to the published Furnace specialist took **about 40 hours**.
 
-| | |
-|---|---|
-| Models | Hog 2.6 specialist and meta generalist, 12.67M parameters each |
-| Compute so far | **about 12.3 hours** (replay conversion not included) |
-| Self-play games | **about 150,000** |
-| Opponents | 358 meta decks from November 2026, all 123 ladder cards, 44 Evolutions, 18 Heroes |
-| Test, 1,000 games vs a frozen older model | **47.6% before self-play, 62.7% after 103,424 games** (± 3) |
+| File | Role | Replays | Self-play games | Win rate vs frozen B (400 games) |
+|---|---|---|---|---|
+| `models/C-furnace-graveyard-v862.pt` | Furnace Graveyard specialist | 5,500 + 4,873 | about 221,000 | **66.0% ± 4.6** |
+| `models/H-minion-giant-28-v342.pt` | Minion Giant 2.8 specialist | 3,169 | about 88,000 | **68.2% ± 4.6** |
+| `models/B-general-12m-424k.pt` | Meta generalist | 56,049 | 424,192 | reference |
 
-That older model is also in the training pool, so 62.7% can overstate general strength. The new models have not been measured against v995 yet.
+All three have 12.67M parameters. Against a frozen older 12.6M Hog 2.6 model, the specialists won **99.7%** (Furnace, 1,266 of 1,270) and **99.1%** (Minion Giant, 1,258 of 1,269) of their games in the last 100 training rounds.
+
+Both opponents are in the training pool, so these numbers can overstate general strength. That older 2.6 is not the 17.5M v995 below, and no large test against v995 has been run yet.
+
+B studied an older replay dataset, about 3-4 months behind the meta. The new [November dataset](https://huggingface.co/datasets/A1A2CV3/IL_Replay_1115) (156,160 games, 4-15 Nov) has so far been used only in part, for the two specialists. A new generalist from random weights on all of it, with every ability active, is under consideration.
+
+**Full training procedure, data and limits: [docs/new-models-november-2026.md](docs/new-models-november-2026.md).**
 
 ## Models (previous generation)
 
