@@ -22,6 +22,8 @@ B studied an older replay dataset, about 3-4 months behind the meta. The new [No
 
 **Full training procedure, data and limits: [docs/new-models-november-2026.md](docs/new-models-november-2026.md).**
 
+**Replay conversion for the offline engine: [conversion/](conversion/README.md).**
+
 ## Models (previous generation)
 
 | File | Deck | Card data | What it is |
