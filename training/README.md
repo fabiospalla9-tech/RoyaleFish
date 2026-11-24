@@ -4,6 +4,9 @@ This is the self-play code used for the RoyaleFish 12.67M models. See [the train
 
 **Offline research only.** Every game runs in the local RoyaleSim simulator. This code does not connect to the real game or to a device. The warning in the main README applies.
 
+> [!WARNING]
+> **Known bug:** `rl_env.py` calls `set_command_delay_ticks` after `reset`, so the command delay is not applied and cards land after 1 tick. A fix is in progress.
+
 ## Files
 
 | File | What it does |
