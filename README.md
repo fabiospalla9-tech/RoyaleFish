@@ -4,6 +4,33 @@ A Clash Royale AI built from scratch by an independent developer. The idea is si
 
 Everything runs offline, in a local simulation.
 
+## New release: Minion Giant 2.8 Lightning, v3634 (26 Nov 2026)
+
+`models/H-minion-giant-28-lightning-v3634.pt` (12.67M parameters, loads with `royalefish12m/load.py`).
+
+Deck: Cannon Evo, Bats Evo, Ice Wizard Hero, Knight, Minion Giant, Barbarian Barrel, Lightning, Skeletons. It plays with a real **1.5 s command delay**, the same delay on both sides.
+
+How it was trained, in order:
+
+1. **Ghost review.** It replayed, 8 times each, 3,216 real games that players with this exact deck **lost**. The opponent repeats its real plays. It then studied only its best try, the one with the least tower damage taken.
+2. **Finishing examples.** In overtime or in the last seconds, when an enemy tower is low enough for one Lightning, it casts it. It also saw contrast examples where the tower is too healthy and Lightning should not go on it.
+3. **Reinforcement learning, about 300 rounds.** It played the current generalist, past versions and about 15,000 ghost games of meta decks: Wizard / Hero Wizard, Magic Archer, Royal Hogs with a second win condition. Rewards: a large bonus for a Lightning finish in sudden death or the last 5 s, and an immediate penalty for huge instant tower hits, such as the Giant Skeleton bomb.
+
+Measured in RoyaleSim, Lightning at level 15, 1.5 s delay for both sides:
+
+| Test | v2863 (previous) | Start of RL (after steps 1-2) | **v3634** |
+|---|---|---|---|
+| Win rate vs current generalist (1,200 games) | not measured | 70.0% | **77.4%** |
+| Tower HP lost per game vs generalist | not measured | 3,510 | **3,473** |
+| Tower HP dealt per game vs generalist | not measured | 5,763 | **6,131** |
+| Lightning finishes taken when available | about 38%* | 78% | **69%** |
+| Defence on 300 unseen meta-deck ghosts (1 = no damage) | not measured | 0.71 | **0.72** |
+| ...vs Hero Wizard decks | not measured | 0.64 | **0.70** |
+
+\* Measured with an older version of the test (Lightning level 16, lower HP threshold).
+
+Weak spots that are still open: Royal Hogs with a second win condition (0.54) and Magic Archer (0.66).
+
 ## New models (24 Nov 2026)
 
 > [!WARNING]
